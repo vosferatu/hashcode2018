@@ -1,20 +1,29 @@
 package hashcode;
 
 import java.io.BufferedReader;
+import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
+import java.io.FileWriter;
 import java.io.IOException;
+import java.nio.charset.Charset;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.nio.file.StandardOpenOption;
 import java.util.ArrayList;
+import java.util.Collections;
 
 public class SelfDrive {
+	
+	private int rows, columns, nvehicles, nrides, bonus, steps;
+	private ArrayList<Ride> rides = new ArrayList();
+	private ArrayList<Vehicle> vehicles = new ArrayList();
 
-	public static void main(String[] args) throws FileNotFoundException, IOException {
+	public void start() throws FileNotFoundException, IOException {
 		
 		File file = new File("res/a_example.in");
-		
-		ArrayList<Ride> rides = new ArrayList();
-		int rows, columns, nvehicles, nrides, bonus, steps;
 		int inc_rides = 0;
 		
 		
@@ -40,24 +49,73 @@ public class SelfDrive {
 				
 				rides.add(new Ride(inc_rides, new Coord(a,b), new Coord(x,y), s,f));
 		    	inc_rides++;
-		    }
-		    
+		    }		    
 		    // line is not visible here.
 		}
 		
+		Collections.sort(rides);
+	
 		for(Ride ride : rides) {
 			System.out.println(ride);
 		}
-		
-		ArrayList<Vehicle> vehicles = new ArrayList<Vehicle>();
+	
 		for(int i = 0; i < nvehicles; i++) {
-			vehicles.add(new Vehicle());
+			vehicles.add(new Vehicle(i+1));
 		}
-		
+	
 		for(Vehicle vehicle : vehicles) {
 			System.out.println(vehicle);
 		}
 		
+		this.solve();
+		
+		this.print();
 	}
 
+	private void solve() {
+		for(int i = 0; i < steps; i++) {
+			for(int j = 0; j < nrides; j++) {
+				if(find_vehicle(rides.get(j)) == -1)
+					break;
+			}
+			
+			for(Vehicle n : vehicles) {
+				
+			}
+		}
+	}
+	
+	private int find_vehicle(Ride r) {
+		if(r.getStatus() != Status.INCOMPLETED)
+			return 0;
+		if(no_vehicles())
+			return -1;
+		
+		for(Vehicle v : vehicles) {
+			if(v.getPos() == r.getStart()) {
+				v.setAssigned(r);
+			}
+		}
+		return 0;
+	}
+	
+	private boolean no_vehicles() {
+		for(Vehicle v : vehicles) {
+			if(v.getAssigned() != null)
+				return false;
+		}
+		return true;
+	}
+
+	private void print() throws IOException {
+		FileWriter fw = new FileWriter("output.txt");
+		BufferedWriter bw = new BufferedWriter(fw);
+		
+		for(Vehicle v : vehicles) {
+			bw.write(v.print()+"\n");
+		}
+		
+		bw.close();
+		fw.close();
+	}
 }
